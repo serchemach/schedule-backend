@@ -1,11 +1,20 @@
 import express, { Express, Request, Response } from 'express';
-import { GetSchedule } from './SiteParsing';
+import { GetGroupMappings, GetWeekSchedule } from './SiteParsing';
 
 const app = express();
 
 let coolString = '';
-GetSchedule('2022-08-29', '2022-09-04', '123').then((array) => {
-    coolString = array.map((schedule) => schedule.date + '<br />' + schedule.entries.join('<br />')).join('<br /> <br />');
+GetWeekSchedule('2022-08-29', '2022-09-04', '123').then((array) => {
+    coolString = array
+        .map(
+            (schedule) =>
+                schedule.date + '<br />' + schedule.entries.join('<br />')
+        )
+        .join('<br /> <br />');
+});
+
+GetGroupMappings(['1'], ['1']).then((array) => {
+    coolString += JSON.stringify(array);
 });
 
 app.use(express.urlencoded({ extended: true }));

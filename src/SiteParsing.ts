@@ -1,20 +1,11 @@
 import { JSDOM } from 'jsdom';
 global.DOMParser = new JSDOM().window.DOMParser;
 
-type Schedule = {
-    entries: string[];
-    date: string;
-}
-
-export const GetSchedule = async (
-    timeperiodStart: string,
-    timeperiodEnd: string,
-    classCode: string
-): Promise<Schedule[]> => {
-    // Fetch the page and decode using cp1251 because cyrillics
-    const schedulePageHtml: Document = await fetch(
-        `https://www.mstu.edu.ru/study/timetable/schedule.php?key=${classCode}&perstart=${timeperiodStart}&perend=${timeperiodEnd}`
-    )
+const FetchPageAndDecode = async (
+    url: string,
+    init?: RequestInit
+): Promise<Document> => {
+    return await fetch(url, init)
         .then((response) => {
             return response.arrayBuffer();
         })
@@ -24,13 +15,30 @@ export const GetSchedule = async (
         })
         .then((html) => {
             const parser = new DOMParser();
+            // console.log(parser.parseFromString(html, 'text/html').textContent);
+            // console.log(html);
             return parser.parseFromString(html, 'text/html');
         })
         .catch((err) => {
-            // tslint:disable-next-line:no-console
             console.log('Failed to fetch page: ', err);
-            return undefined;
+            return new Document();
         });
+};
+
+type Schedule = {
+    entries: string[];
+    date: string;
+};
+
+export const GetWeekSchedule = async (
+    timeperiodStart: string,
+    timeperiodEnd: string,
+    classCode: string
+): Promise<Schedule[]> => {
+    // Fetch the page and decode using cp1251 because cyrillics
+    const schedulePageHtml: Document = await FetchPageAndDecode(
+        `https://www.mstu.edu.ru/study/timetable/schedule.php?key=${classCode}&perstart=${timeperiodStart}&perend=${timeperiodEnd}`
+    );
 
     const elements = schedulePageHtml?.querySelectorAll(
         '.col-md-12 .row .col-md-12'
@@ -38,8 +46,8 @@ export const GetSchedule = async (
 
     const result: Schedule[] = [];
     elements.forEach((schedule) => {
-        if(!schedule.querySelector('.title')){
-            return ;
+        if (!schedule.querySelector('.title')) {
+            return;
         }
 
         const currentSchedule: Schedule = {
@@ -55,7 +63,6 @@ export const GetSchedule = async (
             }
         });
 
-        // tslint:disable-next-line:no-console
         console.log(currentSchedule);
 
         result.push(currentSchedule);
@@ -64,4 +71,53 @@ export const GetSchedule = async (
     return result;
 };
 
-// const GetGroupMappings = () => {};
+type GroupMapping = {
+    departmentNumber: string;
+    courseYear: string;
+    groupName: string;
+};
+
+export const GetGroupMappings = async (
+    departmentNumbers: string[],
+    courseYearNumbers: string[]
+): Promise<GroupMapping[]> => {
+    const mappings: GroupMapping[] = [];
+
+    await Promise.all(
+        departmentNumbers.map(async (departmentNumber) => {
+            await Promise.all(
+                courseYearNumbers.map(async (courseYear) => {
+                    const postForm = new FormData();
+                    postForm.set('facs', departmentNumber);
+                    postForm.set('courses', courseYear);
+                    postForm.set('mode', '1');
+                    postForm.set('pers', '0');
+
+                    const response: Document = await FetchPageAndDecode(
+                        'https://www.mstu.edu.ru/study/timetable/',
+                        {
+                            method: 'POST',
+                            body: postForm,
+                        }
+                    );
+
+                    console.log(departmentNumber + ' ' + courseYear);
+
+                    const groupButtons = response.querySelectorAll(
+                        '.table-responsive .table .btn.btn-default'
+                    );
+                    groupButtons.forEach((button) =>
+                        mappings.push({
+                            groupName: button.textContent,
+                            departmentNumber,
+                            courseYear,
+                        })
+                    );
+                })
+            );
+        })
+    );
+
+    console.log('Finally finished');
+    return mappings;
+};
