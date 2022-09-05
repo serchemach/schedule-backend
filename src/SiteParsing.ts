@@ -1,10 +1,17 @@
 import { JSDOM } from 'jsdom'
 global.DOMParser = new JSDOM().window.DOMParser
 
+type ScheduleEntry = {
+	entryNumber: number;
+	entryData: string;
+}
+
+type Schedule = ScheduleEntry[];
+
 export const GetSchedule = async (
     timeperiodString: string,
     classCode: string
-): Promise<string[]> => {
+): Promise<Schedule[]> => {
     const [timeperiodStart, timeperiodEnd] = timeperiodString
         .split('-')
         .map((item) => item.replaceAll('.', '-'));
@@ -13,8 +20,6 @@ export const GetSchedule = async (
         `https://www.mstu.edu.ru/study/timetable/schedule.php?key=${classCode}&perstart=${timeperiodStart}&perend=${timeperiodEnd}`
     )
         .then((response) => {
-            // tslint:disable-next-line:no-console
-            console.log("p134513554541553515135");
             return response.arrayBuffer();
         })
         .then((buffer) => {
@@ -23,9 +28,6 @@ export const GetSchedule = async (
         })
         .then((html) => {
             const parser = new DOMParser();
-            // tslint:disable-next-line:no-console
-            console.log(html);
-
             return parser.parseFromString(html, 'text/html');
         })
         .catch((err) => {
@@ -34,9 +36,10 @@ export const GetSchedule = async (
             return undefined;
         });
 
-    const elements = schedulePageHtml.querySelectorAll('.col-md-12 .row .col-md-12');
-    const result: string[] = [];
-    elements.forEach((item)=>{
+    const elements = schedulePageHtml?.querySelectorAll('.col-md-12 .row .col-md-12');
+    let result: Schedule[] = [];
+    elements.forEach((schedule)=>{
+    	
         // tslint:disable-next-line:no-console
         console.log(item.textContent);
 
@@ -45,3 +48,10 @@ export const GetSchedule = async (
 
     return result;
 };
+
+
+
+const GetGroupMappings = () => {
+	
+}
+

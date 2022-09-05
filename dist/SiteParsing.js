@@ -19,8 +19,6 @@ const GetSchedule = (timeperiodString, classCode) => __awaiter(void 0, void 0, v
     // Using a cors proxy because mstu.edu.ru doesn't return the necessary headers on a get request
     const schedulePageHtml = yield fetch(`https://www.mstu.edu.ru/study/timetable/schedule.php?key=${classCode}&perstart=${timeperiodStart}&perend=${timeperiodEnd}`)
         .then((response) => {
-        // tslint:disable-next-line:no-console
-        console.log("p134513554541553515135");
         return response.arrayBuffer();
     })
         .then((buffer) => {
@@ -29,8 +27,6 @@ const GetSchedule = (timeperiodString, classCode) => __awaiter(void 0, void 0, v
     })
         .then((html) => {
         const parser = new DOMParser();
-        // tslint:disable-next-line:no-console
-        console.log(html);
         return parser.parseFromString(html, 'text/html');
     })
         .catch((err) => {
@@ -38,7 +34,7 @@ const GetSchedule = (timeperiodString, classCode) => __awaiter(void 0, void 0, v
         console.log('Failed to fetch page: ', err);
         return undefined;
     });
-    const elements = schedulePageHtml.querySelectorAll('.col-md-12 .row .col-md-12');
+    const elements = schedulePageHtml === null || schedulePageHtml === void 0 ? void 0 : schedulePageHtml.querySelectorAll('.col-md-12 .row .col-md-12');
     const result = [];
     elements.forEach((item) => {
         // tslint:disable-next-line:no-console
