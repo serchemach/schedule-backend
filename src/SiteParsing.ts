@@ -1,21 +1,17 @@
-import { JSDOM } from 'jsdom'
-global.DOMParser = new JSDOM().window.DOMParser
+import { JSDOM } from 'jsdom';
+global.DOMParser = new JSDOM().window.DOMParser;
 
-type ScheduleEntry = {
-	entryNumber: number;
-	entryData: string;
+type Schedule = {
+    entries: string[];
+    date: string;
 }
 
-type Schedule = ScheduleEntry[];
-
 export const GetSchedule = async (
-    timeperiodString: string,
+    timeperiodStart: string,
+    timeperiodEnd: string,
     classCode: string
 ): Promise<Schedule[]> => {
-    const [timeperiodStart, timeperiodEnd] = timeperiodString
-        .split('-')
-        .map((item) => item.replaceAll('.', '-'));
-    // Using a cors proxy because mstu.edu.ru doesn't return the necessary headers on a get request
+    // Fetch the page and decode using cp1251 because cyrillics
     const schedulePageHtml: Document = await fetch(
         `https://www.mstu.edu.ru/study/timetable/schedule.php?key=${classCode}&perstart=${timeperiodStart}&perend=${timeperiodEnd}`
     )
@@ -36,22 +32,36 @@ export const GetSchedule = async (
             return undefined;
         });
 
-    const elements = schedulePageHtml?.querySelectorAll('.col-md-12 .row .col-md-12');
-    let result: Schedule[] = [];
-    elements.forEach((schedule)=>{
-    	
-        // tslint:disable-next-line:no-console
-        console.log(item.textContent);
+    const elements = schedulePageHtml?.querySelectorAll(
+        '.col-md-12 .row .col-md-12'
+    );
 
-        result.push(item.textContent);
-    })
+    const result: Schedule[] = [];
+    elements.forEach((schedule) => {
+        if(!schedule.querySelector('.title')){
+            return ;
+        }
+
+        const currentSchedule: Schedule = {
+            entries: [],
+            date: schedule.querySelector('.title').textContent,
+        };
+
+        const scheduleEntries = schedule.querySelectorAll('.title ~ *');
+        scheduleEntries.forEach((scheduleEntry) => {
+            const entryData: string = scheduleEntry.textContent;
+            if (entryData.length > 1) {
+                currentSchedule.entries.push(entryData);
+            }
+        });
+
+        // tslint:disable-next-line:no-console
+        console.log(currentSchedule);
+
+        result.push(currentSchedule);
+    });
 
     return result;
 };
 
-
-
-const GetGroupMappings = () => {
-	
-}
-
+// const GetGroupMappings = () => {};
