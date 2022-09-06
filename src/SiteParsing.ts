@@ -1,5 +1,4 @@
 import { JSDOM } from 'jsdom';
-import FormData from 'form-data'
 global.DOMParser = new JSDOM().window.DOMParser;
 
 const FetchPageAndDecode = async (
@@ -82,7 +81,7 @@ const GetGroupPage = async (
     departmentNumber: string,
     courseYear: string
 ): Promise<Document> => {
-    const postForm = new FormData();
+    const postForm = new URLSearchParams();
     postForm.set('facs', departmentNumber);
     postForm.set('courses', courseYear);
     postForm.set('mode', '1');
