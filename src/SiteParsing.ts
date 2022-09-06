@@ -1,6 +1,5 @@
 import { JSDOM } from 'jsdom';
-import {RequestInfo, RequestInit} from 'node-fetch'
-const fetch = (url: RequestInfo, init?: RequestInit) =>  import("node-fetch").then(({ default: fetch }) => fetch(url, init));
+import fetch from 'cross-fetch'
 global.DOMParser = new JSDOM().window.DOMParser;
 
 const FetchPageAndDecode = async (
