@@ -133,19 +133,26 @@ export const GetGroupMappings = async (
 };
 
 export const GetGroupKey = async (mapping: GroupMapping): Promise<string> => {
-    const page = await GetGroupPage(mapping.departmentNumber, mapping.courseYear);
+    const page = await GetGroupPage(
+        mapping.departmentNumber,
+        mapping.courseYear
+    );
     const links = page.querySelectorAll('.table-responsive .table tr');
 
     let result = '';
 
     links.forEach((link) => {
-        if(link.textContent.includes(mapping.groupName)){
-            console.log(link?.querySelector('a')?.textContent)
+        if (link.textContent.includes(mapping.groupName)) {
+            console.log(link?.querySelector('a')?.textContent);
 
-            result = link.querySelector('a').getAttribute('href').replace('schedule.php?', '').split('&')[0].replace('key=', '');
+            result = link
+                .querySelector('a')
+                .getAttribute('href')
+                .replace('schedule.php?', '')
+                .split('&')[0]
+                .replace('key=', '');
         }
-    })
-
+    });
 
     return result;
 };
