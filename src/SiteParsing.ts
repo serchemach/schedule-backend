@@ -1,4 +1,5 @@
 import { JSDOM } from 'jsdom';
+import FormData from 'form-data'
 global.DOMParser = new JSDOM().window.DOMParser;
 
 const FetchPageAndDecode = async (
