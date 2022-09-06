@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express';
-import { GetGroupMappings, GetWeekSchedule } from './SiteParsing';
+import { GetGroupKey, GetGroupMappings, GetWeekSchedule, GroupMapping } from './SiteParsing';
 
 const app = express();
 
@@ -15,11 +15,16 @@ GetWeekSchedule('2022-08-29', '2022-09-04', '123').then((array) => {
 
 GetGroupMappings(['1'], ['1']).then((array) => {
     coolString += JSON.stringify(array);
+
+    GetGroupKey(array[0]).then((link) => {
+        coolString += "<br/>" + link;
+    })
 });
+
+
 
 app.use(express.urlencoded({ extended: true }));
 app.all('/', (req, res) => {
-    // tslint:disable-next-line:no-console
     console.log('Just got a request!');
     res.send(coolString);
 });

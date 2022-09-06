@@ -71,10 +71,29 @@ export const GetWeekSchedule = async (
     return result;
 };
 
-type GroupMapping = {
+export type GroupMapping = {
     departmentNumber: string;
     courseYear: string;
     groupName: string;
+};
+
+const GetGroupPage = async (
+    departmentNumber: string,
+    courseYear: string
+): Promise<Document> => {
+    const postForm = new FormData();
+    postForm.set('facs', departmentNumber);
+    postForm.set('courses', courseYear);
+    postForm.set('mode', '1');
+    postForm.set('pers', '0');
+
+    return await FetchPageAndDecode(
+        'https://www.mstu.edu.ru/study/timetable/',
+        {
+            method: 'POST',
+            body: postForm,
+        }
+    );
 };
 
 export const GetGroupMappings = async (
@@ -87,18 +106,9 @@ export const GetGroupMappings = async (
         departmentNumbers.map(async (departmentNumber) => {
             await Promise.all(
                 courseYearNumbers.map(async (courseYear) => {
-                    const postForm = new FormData();
-                    postForm.set('facs', departmentNumber);
-                    postForm.set('courses', courseYear);
-                    postForm.set('mode', '1');
-                    postForm.set('pers', '0');
-
-                    const response: Document = await FetchPageAndDecode(
-                        'https://www.mstu.edu.ru/study/timetable/',
-                        {
-                            method: 'POST',
-                            body: postForm,
-                        }
+                    const response = await GetGroupPage(
+                        departmentNumber,
+                        courseYear
                     );
 
                     console.log(departmentNumber + ' ' + courseYear);
@@ -120,4 +130,22 @@ export const GetGroupMappings = async (
 
     console.log('Finally finished');
     return mappings;
+};
+
+export const GetGroupKey = async (mapping: GroupMapping): Promise<string> => {
+    const page = await GetGroupPage(mapping.departmentNumber, mapping.courseYear);
+    const links = page.querySelectorAll('.table-responsive .table tr');
+
+    let result = '';
+
+    links.forEach((link) => {
+        if(link.textContent.includes(mapping.groupName)){
+            console.log(link?.querySelector('a')?.textContent)
+
+            result = link.querySelector('a').getAttribute('href').replace('schedule.php?', '').split('&')[0].replace('key=', '');
+        }
+    })
+
+
+    return result;
 };
