@@ -5,6 +5,8 @@ import {
     GetWeekSchedule,
     GroupMapping,
 } from './SiteParsing';
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 const app = express();
 
@@ -20,17 +22,18 @@ const app = express();
 
 const departmentNumbers = ['1', '2', '3', '4'];
 const classYearNumbers = ['1', '2', '3', '4', '5', '6'];
-let mappings: GroupMapping[] = [];
+console.log(process.env.MAPPINGS)
+const mappings: GroupMapping[] = JSON.parse(process.env.MAPPINGS);
 
-GetGroupMappings(departmentNumbers, classYearNumbers).then((array) => {
-    // coolString += JSON.stringify(array);
-    console.log(JSON.stringify(array));
-    mappings = array;
+// GetGroupMappings(departmentNumbers, classYearNumbers).then((array) => {
+//     // coolString += JSON.stringify(array);
+//     console.log(JSON.stringify(array));
+//     mappings = array;
 
-    // GetGroupKey(array[0]).then((link) => {
-    //     coolString += '<br/>' + link;
-    // });
-});
+//     // GetGroupKey(array[0]).then((link) => {
+//     //     coolString += '<br/>' + link;
+//     // });
+// });
 
 app.use(express.urlencoded({ extended: true }));
 // app.all('/', (req, res) => {
