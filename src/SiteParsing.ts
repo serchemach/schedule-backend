@@ -64,8 +64,6 @@ export const GetWeekSchedule = async (
             }
         });
 
-        console.log(currentSchedule);
-
         result.push(currentSchedule);
     });
 
@@ -143,7 +141,7 @@ export const GetGroupKey = async (mapping: GroupMapping): Promise<string> => {
     let result = '';
 
     links.forEach((link) => {
-        if (link.textContent.includes(mapping.groupName)) {
+        if (link?.querySelector('a')?.textContent === mapping.groupName) {
             console.log(link?.querySelector('a')?.textContent);
 
             result = link
