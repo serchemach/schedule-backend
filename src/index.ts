@@ -7,6 +7,7 @@ import {
 } from './SiteParsing';
 import * as dotenv from 'dotenv';
 import { GetGroupMappingsFromFile, WriteGroupMappingsToFile } from './Caching';
+import { createWriteStream, existsSync, mkdirSync } from 'fs';
 dotenv.config();
 
 const app = express();
@@ -26,6 +27,16 @@ const classYearNumbers = ['1', '2', '3', '4', '5', '6'];
 // console.log(process.env.MAPPINGS)
 const mappings: GroupMapping[] = GetGroupMappingsFromFile('mappings.mp');
 console.log(mappings);
+
+if (!existsSync('log')) {
+    mkdirSync('log');
+}
+const logFileStream = createWriteStream(
+    'log/' + new Date().toDateString() + '.log',
+    {
+        flags: 'as+',
+    }
+);
 
 // GetGroupMappings(departmentNumbers, classYearNumbers).then((array) => {
 //     // coolString += JSON.stringify(array);
@@ -51,6 +62,13 @@ app.get('/get-schedule', (req, res) => {
     );
     if (!mapping || !req.query.periodStart || !req.query.periodEnd) {
         res.status(404);
+
+        logFileStream.write(
+            new Date().toTimeString() +
+                ' recieved invalid request from ' +
+                req.ip +
+                '\n'
+        );
     } else {
         GetGroupKey(mapping).then((key) => {
             GetWeekSchedule(
@@ -59,6 +77,15 @@ app.get('/get-schedule', (req, res) => {
                 key
             ).then((schedule) => {
                 res.send(JSON.stringify(schedule));
+
+                logFileStream.write(
+                    new Date().toTimeString() +
+                        ' successfully returned the schedule for ' +
+                        req.ip +
+                        ' with groupName: ' +
+                        mapping.groupName +
+                        '\n'
+                );
             });
         });
     }
@@ -66,6 +93,12 @@ app.get('/get-schedule', (req, res) => {
 
 app.get('/group-names', (req, res) => {
     res.send(JSON.stringify(mappings.map((mapping) => mapping.groupName)));
+    logFileStream.write(
+        new Date().toTimeString() +
+            ' successfully returned group names for ' +
+            req.ip +
+            '\n'
+    );
 });
 
 // app.post('/get-key', (req, res) => {

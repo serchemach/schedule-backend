@@ -47,7 +47,7 @@ export const WriteGroupMappingsToFile = (
 //         const currentTime = (new Date()).getTime();
 //         const timeDifferenceHours = (currentTime - key.cachTime) / 1000 / 60 / 60;
 //         if(key.cachedValue === '' || timeDifferenceHours > 1){
-            
+
 //         }
 //         else{
 //             return key.cachedValue;
