@@ -23,34 +23,34 @@ export const WriteGroupMappingsToFile = (
     }
 };
 
-type CachedMapping = {
-    cachTime: number;
-    cachedValue: string;
-};
+// type CachedMapping = {
+//     cachTime: number;
+//     cachedValue: string;
+// };
 
-class MappingCacher {
-    storedKeys: Map<string, CachedMapping>;
+// class MappingCacher {
+//     storedKeys: Map<string, CachedMapping>;
 
-    constructor(groupMappings: GroupMapping[]) {
-        this.storedKeys = new Map<string, CachedMapping>();
+//     constructor(groupMappings: GroupMapping[]) {
+//         this.storedKeys = new Map<string, CachedMapping>();
 
-        groupMappings.forEach((mapping) => {
-            this.storedKeys.set(mapping.groupName, {
-                cachTime: new Date(),
-                cachedValue: '',
-            });
-        });
-    }
+//         groupMappings.forEach((mapping) => {
+//             this.storedKeys.set(mapping.groupName, {
+//                 cachTime: new Date(),
+//                 cachedValue: '',
+//             });
+//         });
+//     }
 
-    get getKey(mapping: GroupMapping) {
-        let key = this.storedKeys.get(mapping.groupName);
-        const currentTime = (new Date()).getTime();
-        const timeDifferenceHours = (currentTime - key.cachTime) / 1000 / 60 / 60;
-        if(key.cachedValue === '' || timeDifferenceHours > 1){
+//     get getKey(mapping: GroupMapping) {
+//         let key = this.storedKeys.get(mapping.groupName);
+//         const currentTime = (new Date()).getTime();
+//         const timeDifferenceHours = (currentTime - key.cachTime) / 1000 / 60 / 60;
+//         if(key.cachedValue === '' || timeDifferenceHours > 1){
             
-        }
-        else{
-            return key.cachedValue;
-        }
-    }
-}
+//         }
+//         else{
+//             return key.cachedValue;
+//         }
+//     }
+// }
