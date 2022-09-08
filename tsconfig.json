@@ -9,16 +9,9 @@
         "outDir": "dist",
         "baseUrl": ".",
         "paths": {
-            "*": [
-                "node_modules/*"
-            ],
+            "*": ["node_modules/*"]
         },
-        "lib": [
-            "ES2021",
-            "DOM"
-        ],
+        "lib": ["ES2021", "DOM"]
     },
-    "include": [
-        "src/**/*"
-    ]
+    "include": ["src/**/*"]
 }

@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom';
-import fetch from 'cross-fetch'
+import fetch from 'cross-fetch';
 global.DOMParser = new JSDOM().window.DOMParser;
 
 const FetchPageAndDecode = async (

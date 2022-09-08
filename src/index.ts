@@ -5,9 +5,9 @@ import {
     GetWeekSchedule,
     GroupMapping,
 } from './SiteParsing';
-import * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
 import { GetGroupMappingsFromFile, WriteGroupMappingsToFile } from './Caching';
-dotenv.config()
+dotenv.config();
 
 const app = express();
 
@@ -24,7 +24,7 @@ const app = express();
 const departmentNumbers = ['1', '2', '3', '4'];
 const classYearNumbers = ['1', '2', '3', '4', '5', '6'];
 // console.log(process.env.MAPPINGS)
-const mappings: GroupMapping[] = GetGroupMappingsFromFile("mappings.mp");
+const mappings: GroupMapping[] = GetGroupMappingsFromFile('mappings.mp');
 console.log(mappings);
 
 // GetGroupMappings(departmentNumbers, classYearNumbers).then((array) => {
