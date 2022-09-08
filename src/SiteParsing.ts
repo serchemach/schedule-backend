@@ -142,7 +142,8 @@ export const GetGroupKey = async (mapping: GroupMapping): Promise<string> => {
 
     links.forEach((link) => {
         if (link?.querySelector('a')?.textContent === mapping.groupName) {
-            console.log(link?.querySelector('a')?.textContent);
+            console.log(link?.querySelector('a')?.textContent + ' served');
+            // console.log(link?.textContent);
 
             result = link
                 .querySelector('a')

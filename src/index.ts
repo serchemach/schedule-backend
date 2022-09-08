@@ -56,7 +56,7 @@ app.use(express.urlencoded({ extended: true }));
 // });
 
 app.get('/get-schedule', (req, res) => {
-    console.log(req.query.groupName);
+    console.log(req.query.groupName + ' requested');
     const mapping = mappings.find(
         (value) => value.groupName === req.query.groupName
     );
