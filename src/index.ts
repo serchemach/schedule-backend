@@ -43,7 +43,7 @@ const pingFileStream = createWriteStream('pingLog.txt', { flags: 'as+' });
 
 const pingInterval = setInterval(
     () => PingForKey(mappings[0], pingFileStream),
-    1000 * 60
+    1000 * 60 * 50
 );
 
 // GetGroupMappings(departmentNumbers, classYearNumbers).then((array) => {
