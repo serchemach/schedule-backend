@@ -7,6 +7,7 @@ import {
 } from './SiteParsing';
 import * as dotenv from 'dotenv';
 import { GetGroupMappingsFromFile, WriteGroupMappingsToFile } from './Caching';
+import { PingForKey } from './KeyPing';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 dotenv.config();
 
@@ -36,6 +37,13 @@ const logFileStream = createWriteStream(
     {
         flags: 'as+',
     }
+);
+
+const pingFileStream = createWriteStream('pingLog.txt', { flags: 'as+' });
+
+const pingInterval = setInterval(
+    () => PingForKey(mappings[0], pingFileStream),
+    1000 * 60
 );
 
 // GetGroupMappings(departmentNumbers, classYearNumbers).then((array) => {
