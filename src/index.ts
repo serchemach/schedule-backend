@@ -13,19 +13,8 @@ dotenv.config();
 
 const app = express();
 
-// let coolString = '';
-// GetWeekSchedule('2022-08-29', '2022-09-04', '123').then((array) => {
-//     coolString = array
-//         .map(
-//             (schedule) =>
-//                 schedule.date + '<br />' + schedule.entries.join('<br />')
-//         )
-//         .join('<br /> <br />');
-// });
-
 const departmentNumbers = ['1', '2', '3', '4'];
 const classYearNumbers = ['1', '2', '3', '4', '5', '6'];
-// console.log(process.env.MAPPINGS)
 const mappings: GroupMapping[] = GetGroupMappingsFromFile('mappings.mp');
 console.log(mappings);
 
@@ -46,22 +35,7 @@ const pingInterval = setInterval(
     1000 * 60 * 50
 );
 
-// GetGroupMappings(departmentNumbers, classYearNumbers).then((array) => {
-//     // coolString += JSON.stringify(array);
-//     console.log(JSON.stringify(array));
-//     mappings = array;
-//     WriteGroupMappingsToFile("mappings.mp", mappings);
-
-//     // GetGroupKey(array[0]).then((link) => {
-//     //     coolString += '<br/>' + link;
-//     // });
-// });
-
 app.use(express.urlencoded({ extended: true }));
-// app.all('/', (req, res) => {
-//     console.log('Just got a request!');
-//     res.send(coolString);
-// });
 
 app.get('/get-schedule', (req, res) => {
     console.log(req.query.groupName + ' requested');
@@ -108,13 +82,5 @@ app.get('/group-names', (req, res) => {
             '\n'
     );
 });
-
-// app.post('/get-key', (req, res) => {
-//     let result: string = 'Results are as such: \n';
-//     result += req.body.department;
-//     result += '\n' + req.body.classYear;
-
-//     res.send(result);
-// });
 
 app.listen(process.env.PORT || 3000);
