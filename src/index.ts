@@ -11,9 +11,16 @@ import { PingForKey } from './KeyPing';
 import { createWriteStream, existsSync, mkdirSync, readFileSync } from 'fs';
 import http from 'http';
 import https from 'https';
+import cors from 'cors';
 dotenv.config();
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin:'*', 
+    credentials:true,
+ }));
+
 const privateKey = readFileSync('certificates/selfsigned.key', 'utf8');
 const certificate = readFileSync('certificates/selfsigned.crt', 'utf8');
 
@@ -39,7 +46,6 @@ const pingInterval = setInterval(
     1000 * 60 * 50
 );
 
-app.use(express.urlencoded({ extended: true }));
 
 app.get('/get-schedule', (req, res) => {
     console.log(req.query.groupName + ' requested');
