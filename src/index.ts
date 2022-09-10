@@ -8,10 +8,14 @@ import {
 import * as dotenv from 'dotenv';
 import { GetGroupMappingsFromFile, WriteGroupMappingsToFile } from './Caching';
 import { PingForKey } from './KeyPing';
-import { createWriteStream, existsSync, mkdirSync } from 'fs';
+import { createWriteStream, existsSync, mkdirSync, readFileSync } from 'fs';
+import http from 'http';
+import https from 'https';
 dotenv.config();
 
 const app = express();
+const privateKey = readFileSync('certificates/selfsigned.key', 'utf8');
+const certificate = readFileSync('certificates/selfsigned.crt', 'utf8');
 
 const departmentNumbers = ['1', '2', '3', '4'];
 const classYearNumbers = ['1', '2', '3', '4', '5', '6'];
@@ -83,4 +87,11 @@ app.get('/group-names', (req, res) => {
     );
 });
 
-app.listen(process.env.PORT || 3000);
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(
+    { key: privateKey, cert: certificate },
+    app
+);
+
+httpServer.listen(8080);
+httpsServer.listen(8443);
