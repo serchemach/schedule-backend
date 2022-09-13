@@ -26,8 +26,15 @@ const FetchPageAndDecode = async (
         });
 };
 
+type ScheduleEntry = {
+    entryNumber: string;
+    entryName: string;
+    entryProfessorName: string;
+    entryClassroomName: string;
+};
+
 type Schedule = {
-    entries: string[];
+    entries: ScheduleEntry[];
     date: string;
 };
 
@@ -58,10 +65,15 @@ export const GetWeekSchedule = async (
 
         const scheduleEntries = schedule.querySelectorAll('.title ~ *');
         scheduleEntries.forEach((scheduleEntry) => {
-            const entryData: string = scheduleEntry.textContent;
-            if (entryData.length > 1) {
-                currentSchedule.entries.push(entryData);
-            }
+            const entryData = scheduleEntry.querySelectorAll('td');
+
+            const entry: ScheduleEntry = {
+                  entryNumber: entryData[0].textContent,
+                  entryName: entryData[1].textContent,
+                  entryProfessorName: entryData[2].textContent,
+                  entryClassroomName: entryData[3].textContent,
+            };
+            currentSchedule.entries.push(entry);
         });
 
         result.push(currentSchedule);
