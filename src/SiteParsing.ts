@@ -41,11 +41,12 @@ type Schedule = {
 export const GetWeekSchedule = async (
     timeperiodStart: string,
     timeperiodEnd: string,
-    classCode: string
+    classCode: string,
+    perKind: string
 ): Promise<Schedule[]> => {
     // Fetch the page and decode using cp1251 because cyrillics
     const schedulePageHtml: Document = await FetchPageAndDecode(
-        `https://www.mstu.edu.ru/study/timetable/schedule.php?key=${classCode}&perstart=${timeperiodStart}&perend=${timeperiodEnd}`
+        `https://www.mstu.edu.ru/study/timetable/schedule.php?key=${classCode}&perstart=${timeperiodStart}&perend=${timeperiodEnd}&perkind=${perKind}`
     );
 
     const elements = schedulePageHtml?.querySelectorAll(
@@ -67,12 +68,22 @@ export const GetWeekSchedule = async (
         scheduleEntries.forEach((scheduleEntry) => {
             const entryData = scheduleEntry.querySelectorAll('td');
 
+            /* Because MSTU displays classes in a table, when there are two classes happening
+               simultaniously, they needed to choose how to number the classes.
+               And they just decided not to number duplicate ones at all.
+               So let's hope querySelectorAll returns the entries in the original order,
+               and use the previous number */
+
             const entry: ScheduleEntry = {
-                  entryNumber: entryData[0].textContent,
-                  entryName: entryData[1].textContent,
-                  entryProfessorName: entryData[2].textContent,
-                  entryClassroomName: entryData[3].textContent,
+                entryNumber:
+                    entryData[0].textContent ||
+                    currentSchedule.entries[currentSchedule.entries.length - 1]
+                        .entryNumber,
+                entryName: entryData[1].textContent,
+                entryProfessorName: entryData[2].textContent,
+                entryClassroomName: entryData[3].textContent,
             };
+
             currentSchedule.entries.push(entry);
         });
 
@@ -143,26 +154,36 @@ export const GetGroupMappings = async (
     return mappings;
 };
 
-export const GetGroupKey = async (mapping: GroupMapping): Promise<string> => {
+type GroupParams = {
+    key: string,
+    perKind: string
+}
+
+export const GetGroupParams = async (mapping: GroupMapping): Promise<GroupParams> => {
     const page = await GetGroupPage(
         mapping.departmentNumber,
         mapping.courseYear
     );
     const links = page.querySelectorAll('.table-responsive .table tr');
 
-    let result = '';
+    const result = {
+        key: '',
+        perKind: ''
+    };
 
     links.forEach((link) => {
         if (link?.querySelector('a')?.textContent === mapping.groupName) {
             console.log(link?.querySelector('a')?.textContent + ' served');
             // console.log(link?.textContent);
 
-            result = link
+            const paramsArray = link
                 .querySelector('a')
                 .getAttribute('href')
                 .replace('schedule.php?', '')
-                .split('&')[0]
-                .replace('key=', '');
+                .split('&');
+
+            result.key = paramsArray[0].replace('key=', '');
+            result.perKind = paramsArray[3].replace('perkind=', '');
         }
     });
 

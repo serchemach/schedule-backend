@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import {
-    GetGroupKey,
     GetGroupMappings,
+    GetGroupParams,
     GetWeekSchedule,
     GroupMapping,
 } from './SiteParsing';
@@ -16,10 +16,12 @@ dotenv.config();
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-    origin:'*',
-    credentials:true,
- }));
+app.use(
+    cors({
+        origin: '*',
+        credentials: true,
+    })
+);
 
 const privateKey = readFileSync('certificates/selfsigned.key', 'utf8');
 const certificate = readFileSync('certificates/selfsigned.crt', 'utf8');
@@ -46,7 +48,6 @@ const pingInterval = setInterval(
     1000 * 60 * 50
 );
 
-
 app.get('/get-schedule', (req, res) => {
     console.log(req.query.groupName + ' requested');
     const mapping = mappings.find(
@@ -62,11 +63,13 @@ app.get('/get-schedule', (req, res) => {
                 '\n'
         );
     } else {
-        GetGroupKey(mapping).then((key) => {
+        GetGroupParams(mapping).then((params) => {
+            console.log(`Key for ${mapping.groupName} is ${params.key}`)
             GetWeekSchedule(
                 req.query.periodStart as string,
                 req.query.periodEnd as string,
-                key
+                params.key,
+                params.perKind
             ).then((schedule) => {
                 res.send(JSON.stringify(schedule));
 

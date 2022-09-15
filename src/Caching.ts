@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { GetGroupKey, GroupMapping } from './SiteParsing';
+import { GroupMapping } from './SiteParsing';
 
 export const GetGroupMappingsFromFile = (filename: string): GroupMapping[] => {
     try {
