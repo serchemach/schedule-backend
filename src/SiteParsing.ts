@@ -22,7 +22,7 @@ const FetchPageAndDecode = async (
         })
         .catch((err) => {
             console.log('Failed to fetch page: ', err);
-            return new Document();
+            return undefined;
         });
 };
 
